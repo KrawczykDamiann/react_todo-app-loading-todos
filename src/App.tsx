@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'; // <-- Dodaj z powrotem useRef
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 import {
   getTodos,
@@ -25,7 +25,6 @@ export const App: React.FC = () => {
   const [loadingIds, setLoadingIds] = useState<number[]>([]);
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
-  // #FIX: Przywracamy useRef do obsługi focusa
   const newTodoFieldRef = useRef<HTMLInputElement>(null);
 
   const handleError = (message: string) => {
@@ -42,7 +41,6 @@ export const App: React.FC = () => {
       });
   }, []);
 
-  // #FIX: Nowy useEffect do focusowania inputa po błędzie
   useEffect(() => {
     if (error) {
       newTodoFieldRef.current?.focus();
@@ -201,7 +199,6 @@ export const App: React.FC = () => {
               areAllCompleted={activeTodos.length === 0}
               onToggleAll={handleToggleAll}
               isAdding={!!tempTodo}
-              // #FIX: Przekazujemy referencję do komponentu Header
               inputRef={newTodoFieldRef}
             />
 
