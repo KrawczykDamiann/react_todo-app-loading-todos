@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react'; // <-- Dodaj z powrotem useRef
 
 import {
   getTodos,
@@ -20,13 +20,13 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[] | null>(null);
   const [error, setError] = useState('');
   const [filterBy, setFilterBy] = useState<FilterStatus>(FilterStatus.ALL);
-
-  // Ta linia musiała zostać przywrócona
   const [newTodoTitle, setNewTodoTitle] = useState('');
-
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [loadingIds, setLoadingIds] = useState<number[]>([]);
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
+
+  // #FIX: Przywracamy useRef do obsługi focusa
+  const newTodoFieldRef = useRef<HTMLInputElement>(null);
 
   const handleError = (message: string) => {
     setError(message);
@@ -41,6 +41,13 @@ export const App: React.FC = () => {
         handleError('Unable to load todos');
       });
   }, []);
+
+  // #FIX: Nowy useEffect do focusowania inputa po błędzie
+  useEffect(() => {
+    if (error) {
+      newTodoFieldRef.current?.focus();
+    }
+  }, [error]);
 
   const activeTodos = useMemo(
     () => (todos || []).filter(t => !t.completed),
@@ -194,6 +201,8 @@ export const App: React.FC = () => {
               areAllCompleted={activeTodos.length === 0}
               onToggleAll={handleToggleAll}
               isAdding={!!tempTodo}
+              // #FIX: Przekazujemy referencję do komponentu Header
+              inputRef={newTodoFieldRef}
             />
 
             <TodoList

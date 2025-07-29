@@ -27,6 +27,7 @@ export const Footer: React.FC<Props> = ({
         <a
           href="#/"
           className={classNames({ selected: filterBy === FilterStatus.ALL })}
+          data-cy="FilterLinkAll"
           onClick={() => onFilterBy(FilterStatus.ALL)}
         >
           All
@@ -34,6 +35,7 @@ export const Footer: React.FC<Props> = ({
         <a
           href="#/active"
           className={classNames({ selected: filterBy === FilterStatus.ACTIVE })}
+          data-cy="FilterLinkActive"
           onClick={() => onFilterBy(FilterStatus.ACTIVE)}
         >
           Active
@@ -43,6 +45,7 @@ export const Footer: React.FC<Props> = ({
           className={classNames({
             selected: filterBy === FilterStatus.COMPLETED,
           })}
+          data-cy="FilterLinkCompleted"
           onClick={() => onFilterBy(FilterStatus.COMPLETED)}
         >
           Completed

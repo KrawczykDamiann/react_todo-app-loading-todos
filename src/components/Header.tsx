@@ -9,6 +9,8 @@ interface Props {
   areAllCompleted: boolean;
   onToggleAll: () => void;
   isAdding: boolean;
+  // #FIX: Dodajemy prop na referencję
+  inputRef: React.RefObject<HTMLInputElement>;
 }
 
 export const Header: React.FC<Props> = ({
@@ -19,6 +21,8 @@ export const Header: React.FC<Props> = ({
   areAllCompleted,
   onToggleAll,
   isAdding,
+  // #FIX: Odbieramy referencję
+  inputRef,
 }) => {
   return (
     <header className="todoapp__header">
@@ -37,6 +41,8 @@ export const Header: React.FC<Props> = ({
       <form onSubmit={onSubmit}>
         <input
           data-cy="NewTodoField"
+          // #FIX: Przypisujemy referencję do elementu input
+          ref={inputRef}
           type="text"
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
