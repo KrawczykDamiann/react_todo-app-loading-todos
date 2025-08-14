@@ -33,6 +33,8 @@ export const App: React.FC = () => {
   };
 
   useEffect(() => {
+    newTodoFieldRef.current?.focus();
+
     getTodos()
       .then(setTodos)
       .catch(() => {
@@ -144,36 +146,25 @@ export const App: React.FC = () => {
     const idsToDelete = completedTodos.map(t => t.id);
 
     setLoadingIds(prev => [...prev, ...idsToDelete]);
+
     const promises = completedTodos.map(todo => deleteTodo(todo.id));
 
-    Promise.all(promises)
-      .then(() =>
-        setTodos(current => (current || []).filter(t => !t.completed)),
-      )
-      .catch(() => handleError('Unable to delete a todo'))
-      .finally(() => setLoadingIds([]));
-  };
+    Promise.allSettled(promises)
+      .then(results => {
+        const failed = results.some(r => r.status === 'rejected');
 
-  const handleToggleAll = () => {
-    if (!todos) {
-      return;
-    }
+        if (failed) {
+          handleError('Unable to delete a todo');
+        }
 
-    const areAllCompleted = activeTodos.length === 0;
-    const todosToUpdate = areAllCompleted ? todos : activeTodos;
-    const promises = todosToUpdate.map(todo => {
-      setLoadingIds(prev => [...prev, todo.id]);
+        const successfulIds = results
+          .filter(r => r.status === 'fulfilled')
+          .map((r, i) => idsToDelete[i]);
 
-      return updateTodo(todo.id, { completed: !areAllCompleted });
-    });
-
-    Promise.all(promises)
-      .then(() =>
         setTodos(current =>
-          (current || []).map(t => ({ ...t, completed: !areAllCompleted })),
-        ),
-      )
-      .catch(() => handleError('Unable to update a todo'))
+          (current || []).filter(t => !successfulIds.includes(t.id)),
+        );
+      })
       .finally(() => setLoadingIds([]));
   };
 
@@ -195,11 +186,8 @@ export const App: React.FC = () => {
               title={newTodoTitle}
               onTitleChange={setNewTodoTitle}
               onSubmit={handleAddTodo}
-              isToggleAllVisible={todos.length > 0}
-              areAllCompleted={activeTodos.length === 0}
-              onToggleAll={handleToggleAll}
-              isAdding={!!tempTodo}
               inputRef={newTodoFieldRef}
+              isAdding={!!tempTodo}
             />
 
             <TodoList

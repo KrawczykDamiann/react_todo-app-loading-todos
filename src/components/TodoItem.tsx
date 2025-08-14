@@ -31,8 +31,6 @@ export const TodoItem: React.FC<Props> = ({
   const handleSave = () => {
     const trimmedTitle = editedTitle.trim();
 
-    onSetEditingId(null);
-
     if (!trimmedTitle) {
       onDelete(todo.id);
 
@@ -40,15 +38,19 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     if (trimmedTitle === todo.title) {
+      onSetEditingId(null);
+
       return;
     }
 
     onUpdate(todo.id, { title: trimmedTitle });
+    onSetEditingId(null);
   };
 
   const handleKeyUp = (event: React.KeyboardEvent) => {
     if (event.key === 'Escape') {
       onSetEditingId(null);
+      setEditedTitle(todo.title);
     }
   };
 
@@ -57,14 +59,14 @@ export const TodoItem: React.FC<Props> = ({
       data-cy="Todo"
       className={classNames('todo', { completed: todo.completed })}
     >
-      <label className="todo__status-label">
+      <label className="todo__status-label" htmlFor={`todo-status-${todo.id}`}>
         <input
+          id={`todo-status-${todo.id}`}
           data-cy="TodoStatus"
           type="checkbox"
           className="todo__status"
           checked={todo.completed}
-          onChange={() => onUpdate(todo.id, { completed: !todo.completed })}
-          // #FIX: Dodano aria-label, aby nadać polu dostępną nazwę
+          readOnly
           aria-label={`Toggle status for ${todo.title}`}
         />
       </label>
